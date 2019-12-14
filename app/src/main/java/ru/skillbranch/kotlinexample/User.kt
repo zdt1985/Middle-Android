@@ -26,7 +26,7 @@ class User private constructor(
 
     private var phone: String? = null
         set(value){
-            field = value?.replace("[^+\\d]".toRegex(), " ")
+            field = value?.replace("[^+\\d]".toRegex(), "")
         }
 
     private var _login: String? = null
@@ -96,6 +96,12 @@ class User private constructor(
         else throw IllegalAccessException("The entered password does not math the current password")
     }
 
+    fun changeAccessCode(rawPhone: String) {
+        val code: String = generateAccessCode()
+        passwordHash = encrypt(code)
+        accessCode = code
+        sendAccessCodeToUser(rawPhone, code)
+    }
     private fun encrypt(password: String): String = salt.plus(password).md5() //good
 
     private fun generateAccessCode(): String {

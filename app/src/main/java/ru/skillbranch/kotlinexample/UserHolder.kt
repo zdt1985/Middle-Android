@@ -32,7 +32,7 @@ object UserHolder {
             .also { user-> if (map.containsKey(user.login)) {
                 throw IllegalArgumentException("A user with this email already exists")
             } else {
-                val validPhone = user.login.replace("[^+\\d]".toRegex(), " ")
+                val validPhone = user.login.replace("[^+\\d]".toRegex(), "")
                 if ( validPhone.length == 12 && validPhone.first() == '+') {
                     map[user.login] = user
                 } else {
@@ -42,8 +42,9 @@ object UserHolder {
         }
     }
 
-    fun requestAccessCode(rawPhone: String): String? {
-        val user = map.get(rawPhone)
-        return user!!.accessCode
+    fun requestAccessCode(rawPhone: String): Unit {
+        val user = map.get(rawPhone.replace("[^+\\d]".toRegex(), ""))
+        user!!.changeAccessCode(rawPhone)
+        return
     }
 }
