@@ -18,9 +18,20 @@ object UserHolder {
     }
 
     fun loginUser (login:String, password: String) : String? {
-        return map[login.trim()]?.run {
-            if (checkPassword(password)) this.userInfo
-            else null
+        val loginIsPhone = login.replace("[^+\\d]".toRegex(), "")
+        when {
+            loginIsPhone.length == 12 && loginIsPhone.first() == '+' -> {
+                return map[loginIsPhone.trim()]?.run {
+                    if (checkPassword(password)) this.userInfo
+                    else null
+                }
+            }
+            else -> {
+                return map[login.trim()]?.run {
+                    if (checkPassword(password)) this.userInfo
+                    else null
+                }
+            }
         }
     }
 
@@ -30,7 +41,7 @@ object UserHolder {
     ):User{
         return User.makeUser(fullName, phone = rawPhone)
             .also { user-> if (map.containsKey(user.login)) {
-                throw IllegalArgumentException("A user with this email already exists")
+                throw IllegalArgumentException("A user with this phone already exists")
             } else {
                 val validPhone = user.login.replace("[^+\\d]".toRegex(), "")
                 if ( validPhone.length == 12 && validPhone.first() == '+') {
